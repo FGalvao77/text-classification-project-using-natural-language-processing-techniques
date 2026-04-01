@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       TYPEFORM_TOKEN:     ${{ secrets.TYPEFORM_TOKEN }}
       TYPEFORM_FORM_ID:   ${{ secrets.TYPEFORM_FORM_ID }}
       FIELD_NAME:         ${{ secrets.FIELD_NAME }}
