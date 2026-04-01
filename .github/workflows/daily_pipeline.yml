@@ -1,0 +1,104 @@
+name: Daily Pipeline
+
+"on":
+  schedule:
+    - cron: "0 8 * * *"     # todo dia às 08:00 UTC
+  workflow_dispatch:        # permite rodar manualmente pelo GitHub
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    env:
+      TYPEFORM_TOKEN:     ${{ secrets.TYPEFORM_TOKEN }}
+      TYPEFORM_FORM_ID:   ${{ secrets.TYPEFORM_FORM_ID }}
+      FIELD_NOME:         ${{ secrets.FIELD_NOME }}
+      FIELD_EMAIL:        ${{ secrets.FIELD_EMAIL }}
+      FIELD_SUBJECT:      ${{ secrets.FIELD_SUBJECT }}
+      FIELD_MESSAGE:     ${{ secrets.FIELD_MESSAGE }}
+      OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL:       ${{ secrets.OPENAI_MODEL }}
+      SLACK_BOT_TOKEN:    ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL_ID:   ${{ secrets.SLACK_CHANNEL_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download spaCy model
+        run: python -m spacy download pt_core_news_sm
+
+      - name: Create data directories
+        run: mkdir -p data/staging/email models
+
+      - name: Validar TYPEFORM_TOKEN
+        run: |
+          if [ -z "$TYPEFORM_TOKEN" ]; then
+            echo "ERRO: TYPEFORM_TOKEN está vazio!"; exit 1
+          fi
+          if [ -z "$TYPEFORM_FORM_ID" ]; then
+            echo "ERRO: TYPEFORM_FORM_ID está vazio!"; exit 1
+          fi
+          echo "Token (primeiros 6 chars): ${TYPEFORM_TOKEN:0:6}..."
+          echo "Form ID: $TYPEFORM_FORM_ID"
+
+          ME=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $TYPEFORM_TOKEN" \
+            https://api.typeform.com/me)
+          echo "GET /me: $ME"
+
+          FORM=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $TYPEFORM_TOKEN" \
+            https://api.typeform.com/forms/$TYPEFORM_FORM_ID)
+          echo "GET /forms/$TYPEFORM_FORM_ID: $FORM"
+
+          RESP=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $TYPEFORM_TOKEN" \
+            "https://api.typeform.com/forms/$TYPEFORM_FORM_ID/responses?page_size=1")
+          echo "GET /forms/$TYPEFORM_FORM_ID/responses: $RESP"
+
+          if [ "$RESP" != "200" ]; then
+            echo "ERRO: não foi possível acessar as respostas (HTTP $RESP)."
+            exit 1
+          fi
+          echo "Acesso às respostas OK."
+
+      - name: 1. Ingestão Typeform
+        run: python src/form_ingest.py
+
+      - name: 2. Merge mensagens
+        run: python src/merge_messages.py
+
+      - name: 3. Limpeza e anotação
+        run: PYTHONPATH=src python src/clean_and_annotate.py
+
+      - name: 4. Treinamento do modelo de sentimento
+        run: python src/train_sentiment.py --data data/unified_clean.csv --out models/sentiment.joblib
+
+      - name: 5. Predição de sentimento
+        run: PYTHONPATH=src python src/predict.py
+
+      - name: 6. Pós-processamento e prioridade
+        run: python src/postprocessing.py
+
+      - name: 7. Geração de respostas LLM
+        run: python src/llm_generate_replies.py
+
+      - name: 8. Envio ao Slack
+        run: python src/send_to_slack_bot.py
+
+
+
+
+
+
+
