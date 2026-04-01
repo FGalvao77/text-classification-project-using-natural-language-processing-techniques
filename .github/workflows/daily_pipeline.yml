@@ -66,7 +66,7 @@ jobs:
           echo "GET /forms/$TYPEFORM_FORM_ID/responses: $RESP"
 
           if [ "$RESP" != "200" ]; then
-            echo "ERRO: não foi possível acessar as respostas (HTTP $RESP)."
+            echo "ERRO: não foi possível acessar as respostas (HTTP $RESP)." 
             exit 1
           fi
           echo "Acesso às respostas OK."
