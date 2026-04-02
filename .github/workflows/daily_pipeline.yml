@@ -3,7 +3,11 @@ name: Daily Pipeline
 "on":
   schedule:
     - cron: "0 8 * * *"     # todo dia às 08:00 UTC
-  workflow_dispatch:        # permite rodar manualmente pelo GitHub
+  workflow_dispatch:
+    inputs:
+      reset_cursor:
+        description: 'Se true, reingere todos os dados.'
+        default: 'false'
 
 jobs:
   pipeline:
@@ -72,13 +76,29 @@ jobs:
           echo "Acesso às respostas OK."
 
       - name: "1. Ingestão de Dados (Typeform)"
-        run: uv run python src/form_ingest.py
+        run: |
+          if [ "${{ github.event.inputs.reset_cursor }}" == "true" ]; then
+            uv run python src/form_ingest.py --reset-cursor
+          else
+            uv run python src/form_ingest.py
+          fi
 
       - name: "2. Consolidação de Mensagens"
         run: uv run python src/merge_messages.py
 
       - name: "3. Limpeza e Anotação de Texto"
-        run: PYTHONPATH=src uv run python src/clean_and_annotate.py
+        run: |
+          PYTHONPATH=src uv run python src/clean_and_annotate.py
+          if [ ! -s data/unified_clean.csv ]; then
+            echo "Nenhum dado novo encontrado. Encerrando pipeline prematuramente."
+            exit 0
+          fi
+          # Adicionalmente, verifica se o CSV tem apenas o cabeçalho
+          ROWS=$(tail -n +2 data/unified_clean.csv | wc -l)
+          if [ "$ROWS" -eq 0 ]; then
+            echo "Nenhum registro nos dados consolidados. Encerrando pipeline prematuramente."
+            exit 0
+          fi
 
       - name: "4. Ajuste do Modelo de Sentimento"
         run: uv run python src/train_sentiment.py --data data/unified_clean.csv --out models/sentiment.joblib

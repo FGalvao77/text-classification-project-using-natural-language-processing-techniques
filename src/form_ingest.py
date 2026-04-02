@@ -136,8 +136,14 @@ def ingest(max_responses: int = 100, reset_cursor: bool = False):
     total = data.get('total_items', len(items))
 
     if not items:
-        print('Nenhuma resposta nova encontrada.')
+        print('Nenhuma resposta nova encontrada no Typeform.')
         return
+
+    # Debug: lista as refs encontradas na primeira resposta para ajudar na configuração
+    first_answers = items[0].get('answers', [])
+    available_refs = [a.get('field', {}).get('ref') for a in first_answers]
+    print(f"Refs disponíveis na primeira resposta: {available_refs}")
+    print(f"Buscando por: name={FIELD_NAME}, email={FIELD_EMAIL}, subject={FIELD_SUBJECT}, message={FIELD_MESSAGE}")
 
     print(f'{len(items)} resposta(s) encontrada(s) (total no form: {total})')
 
