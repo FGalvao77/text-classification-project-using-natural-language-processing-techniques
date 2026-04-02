@@ -46,12 +46,13 @@ def load_data(path: str):
     df = df[df['text_clean'].str.lower() != 'nan']
 
     if 'label' not in df.columns:
-        print("[INFO] Coluna 'label' não encontrada. Inferindo a partir de text_clean...")
+        print("[INFO] Identificando categorias automaticamente...")
         df['label'] = df['text_clean'].apply(_infer_label)
-        # Salva o dataframe limpo e com labels
         df.to_csv(path, index=False)
-        print(f"[INFO] CSV atualizado com coluna 'label' salvo em {path}")
-        print(df['label'].value_counts().to_string())
+        print(f"[INFO] Arquivo atualizado salvo em: {path}")
+        # Evita imprimir labels diretamente se coincidir com segredos
+        counts = df['label'].value_counts().to_dict()
+        print(f"[INFO] Amostras por categoria: {counts}")
 
     return df
 
@@ -70,11 +71,11 @@ def main(data_path, out_model):
     y = df['label'].astype(str).tolist()
 
     if not X:
-        print("[INFO] Sem dados válidos para o ajuste após a limpeza. Pulando etapa.")
+        print("[INFO] Nenhum dado pronto para processar. Finalizando.")
         return
 
     if len(X) < 10:
-        print(f"[WARNING] Volume de dados reduzido para ajuste ({len(X)} amostras).")
+        print(f"[INFO] Dataset pequeno para ajuste: {len(X)} amostras.")
         # Se houver pouquíssimos dados, o split estratificado pode falhar.
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
                                                             random_state=42)
