@@ -135,17 +135,20 @@ def ingest(max_responses: int = 100, reset_cursor: bool = False):
     items = data.get('items', [])
     total = data.get('total_items', len(items))
 
+    print(f"Total de respostas no formulário: {total}")
     if not items:
-        print('Nenhuma resposta nova encontrada no Typeform.')
+        print('Nenhuma resposta NOVA encontrada (baseado no cursor).')
         return
 
-    # Debug: lista as refs encontradas na primeira resposta para ajudar na configuração
-    first_answers = items[0].get('answers', [])
-    available_refs = [a.get('field', {}).get('ref') for a in first_answers]
-    print(f"Refs disponíveis na primeira resposta: {available_refs}")
-    print(f"Buscando por: name={FIELD_NAME}, email={FIELD_EMAIL}, subject={FIELD_SUBJECT}, message={FIELD_MESSAGE}")
-
-    print(f'{len(items)} resposta(s) encontrada(s) (total no form: {total})')
+    # Debug robusto: lista exatamente o que o Typeform está enviando
+    print("--- DEBUG DE ESTRUTURA DO TYPEFORM ---")
+    for i, item in enumerate(items[:1]): # Analisa apenas a primeira para não poluir o log
+        answers = item.get('answers', [])
+        found_refs = [a.get('field', {}).get('ref') for a in answers]
+        print(f"Resposta ID: {item.get('response_id')}")
+        print(f"Refs encontradas nesta resposta: {found_refs}")
+        print(f"Buscando por REFs: Name={FIELD_NAME}, Email={FIELD_EMAIL}, Subject={FIELD_SUBJECT}, Message={FIELD_MESSAGE}")
+    print("---------------------------------------")
 
     ingested = 0
     last_token = None

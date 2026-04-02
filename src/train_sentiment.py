@@ -40,10 +40,11 @@ def load_data(path: str):
     else:
         df['text_clean'] = df['text_clean'].astype(str)
 
-    # Limpeza básica de nulos antes de inferir ou treinar
-    df = df.dropna(subset=['text_clean'])
+    # Limpeza básica apenas se o texto estiver vazio
+    df['text_clean'] = df['text_clean'].fillna('')
     df = df[df['text_clean'].str.strip() != '']
-    df = df[df['text_clean'].str.lower() != 'nan']
+    
+    print(f"[INFO] Dados carregados: {len(df)} linhas.")
 
     if 'label' not in df.columns:
         print("[INFO] Identificando categorias automaticamente...")
