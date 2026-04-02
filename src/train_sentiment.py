@@ -31,16 +31,19 @@ def load_data(path: str):
     if 'label' not in df.columns and 'sentiment' in df.columns:
         df = df.rename(columns={'sentiment': 'label'})
 
-    # Garante que a coluna de texto principal existe
+    # Garante que a coluna de texto principal existe e é do tipo string
     if 'text_clean' not in df.columns:
         if 'text' in df.columns:
-            df['text_clean'] = df['text']
+            df['text_clean'] = df['text'].astype(str)
         else:
             raise ValueError("O CSV deve conter pelo menos a coluna 'text' ou 'text_clean'.")
+    else:
+        df['text_clean'] = df['text_clean'].astype(str)
 
     # Limpeza básica de nulos antes de inferir ou treinar
     df = df.dropna(subset=['text_clean'])
     df = df[df['text_clean'].str.strip() != '']
+    df = df[df['text_clean'].str.lower() != 'nan']
 
     if 'label' not in df.columns:
         print("[INFO] Coluna 'label' não encontrada. Inferindo a partir de text_clean...")
