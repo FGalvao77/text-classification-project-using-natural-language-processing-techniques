@@ -1,12 +1,15 @@
 # 📧 AI-Powered Email Triage & Automation Pipeline
 
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-1.5%2B-150458.svg?style=flat&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
-[![NLP](https://img.shields.io/badge/NLP-spaCy%20%7C%20scikit--learn-green.svg)](https://spacy.io/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991.svg?style=flat&logo=openai&logoColor=white)](https://openai.com/)
-[![Slack](https://img.shields.io/badge/Slack-Integration-4A154B.svg?style=flat&logo=slack&logoColor=white)](https://slack.com/)
-[![UV](https://img.shields.io/badge/Package%20Manager-uv-de5b43.svg?style=flat&logo=python&logoColor=white)](https://github.com/astral-sh/uv)
-[![CI/CD](https://img.shields.io/badge/Automation-GitHub%20Actions-2088FF.svg?style=flat&logo=github-actions&logoColor=white)](https://github.com/features/actions)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E.svg?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![spaCy](https://img.shields.io/badge/spaCy-09A3D5.svg?style=flat&logo=spacy&logoColor=white)](https://spacy.io/)
+[![Typeform](https://img.shields.io/badge/Typeform-262627.svg?style=flat&logo=typeform&logoColor=white)](https://www.typeform.com/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991.svg?style=flat&logo=openai&logoColor=white)](https://openai.com/)
+[![Slack](https://img.shields.io/badge/Slack-4A154B.svg?style=flat&logo=slack&logoColor=white)](https://slack.com/)
+[![UV](https://img.shields.io/badge/uv-de5b43.svg?style=flat&logo=python&logoColor=white)](https://github.com/astral-sh/uv)
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=flat&logo=github-actions&logoColor=white)](https://github.com/features/actions)
+[![VS Code](https://img.shields.io/badge/VS%20Code-007ACC.svg?style=flat&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
 
 Uma solução completa de Engenharia de Dados e NLP para automação de atendimento ao cliente. Este pipeline transforma mensagens brutas recebidas via Typeform em ações estruturadas, classificando sentimentos, priorizando casos críticos e gerando rascunhos de resposta inteligentes via LLM, com entrega final integrada ao Slack.
 
