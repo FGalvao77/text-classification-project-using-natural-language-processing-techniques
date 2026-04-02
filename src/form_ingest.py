@@ -165,6 +165,17 @@ def ingest(max_responses: int = 100, reset_cursor: bool = False):
             subject  = get_answer(answers, FIELD_SUBJECT)
             message = get_answer(answers, FIELD_MESSAGE)
 
+            # --- FALLBACK: se não encontrou nada nas refs configuradas, pega o que houver ---
+            if not subject and not message and answers:
+                print(f"  [AVISO] Campos configurados não encontrados na resposta {response_id}. Usando fallback.")
+                all_texts = []
+                for ans in answers:
+                    val = get_answer([ans], ans.get('field', {}).get('ref'))
+                    if val: all_texts.append(str(val))
+                message = " | ".join(all_texts)
+                subject = "Resposta do Form"
+            # ----------------------------------------------------------------------------
+
             # texto principal para o NLP — junta assunto + mensagem
             text = f'{subject}: {message}'.strip() if message else subject
 
