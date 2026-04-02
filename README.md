@@ -147,6 +147,7 @@ O projeto conta com um workflow do **GitHub Actions** (`daily_pipeline.yml`) que
 **Fernando Galvão**
 
 Engenheiro de Dados e Aprendizado de Máquina | Especialista em Automação e IA
+<br>
 Data Engineer and Machine Learning | Automation and AI Specialist
 
 ---
